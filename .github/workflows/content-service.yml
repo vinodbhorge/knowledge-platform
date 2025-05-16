@@ -12,6 +12,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+    
+      - name: Set up JDK 11 and Maven
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'maven'
 
       - name: Determine registry and login
         run: |
@@ -36,6 +43,9 @@ jobs:
           fi
 
           echo "REGISTRY_URL=${REGISTRY_URL}" >> $GITHUB_ENV
+
+      - name: Build Content Service
+        run: mvn clean package -f content-api/content-service/pom.xml
 
       - name: Build Docker Image
         run: |
