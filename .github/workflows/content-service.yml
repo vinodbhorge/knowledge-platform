@@ -46,8 +46,10 @@ jobs:
 
       - name: Build Dependencies
         run: |
+          mvn clear install -DskipTests -f platform-core/platform-common/pom.xml
           mvn clean install -DskipTests -f platform-core/actor-core/pom.xml
           mvn clean install -DskipTests -f platform-core/kafka-client/pom.xml
+          mvn clean install -DskipTests -f ontology-engine/graph-common/pom.xml
           mvn clean install -DskipTests -f ontology-engine/graph-engine_2.12/pom.xml
           mvn clean install -DskipTests -f platform-modules/mimetype-manager/pom.xml
           mvn clean install -DskipTests -f platform-modules/import-manager/pom.xml
