@@ -24,14 +24,6 @@ jobs:
           java-version: '11'
           cache: 'maven'
 
-      # Step 3: Set environment variables
-      - name: Set environment variables
-        run: |
-          echo "CLOUD_STORE_GROUP_ID=org.sunbird" >> $GITHUB_ENV
-          echo "CLOUD_STORE_ARTIFACT_ID=cloud-store-sdk_2.12" >> $GITHUB_ENV
-          echo "CLOUD_STORE_VERSION=1.4.6" >> $GITHUB_ENV
-
-
       # Step 4: Build the project
       - name: Build Content Service
         run: |
