@@ -28,18 +28,18 @@ jobs:
       - name: Build Content Service
         run: |
           mvn clean install -DskipTests=true \
-            -DCLOUD_STORE_GROUP_ID=${{ env.CLOUD_STORE_GROUP_ID }} \
-            -DCLOUD_STORE_ARTIFACT_ID=${{ env.CLOUD_STORE_ARTIFACT_ID }} \
-            -DCLOUD_STORE_VERSION=${{ env.CLOUD_STORE_VERSION }}
+            -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} \
+            -DCLOUD_STORE_ARTIFACT_ID=${{ vars.CLOUD_STORE_ARTIFACT_ID }} \
+            -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
 
       # Step 5: Package the project
       - name: Package Content Service
         run: |
           cd content-api
           mvn play2:dist -pl content-service \
-            -DCLOUD_STORE_GROUP_ID=${{ env.CLOUD_STORE_GROUP_ID }} \
-            -DCLOUD_STORE_ARTIFACT_ID=${{ env.CLOUD_STORE_ARTIFACT_ID }} \
-            -DCLOUD_STORE_VERSION=${{ env.CLOUD_STORE_VERSION }}
+            -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} \
+            -DCLOUD_STORE_ARTIFACT_ID=${{ vars.CLOUD_STORE_ARTIFACT_ID }} \
+            -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
 
       # Step 6: Set up Login to Docker registry
       - name: Determine registry and login
