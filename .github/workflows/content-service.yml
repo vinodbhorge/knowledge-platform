@@ -44,8 +44,11 @@ jobs:
 
           echo "REGISTRY_URL=${REGISTRY_URL}" >> $GITHUB_ENV
 
-      - name: Build Content Service
-        run: mvn clean package -DskipTests -f content-api/content-service/pom.xml
+      - name: Build Content Service 
+        run: |
+          mvn clean install -DskipTests -f content-api/content-actors/pom.xml
+          mvn clean install -DskipTests -f content-api/collection-csv-actors/pom.xml
+          mvn clean install -DskipTests -f content-api/content-service/pom.xml
 
       - name: Build Docker Image
         run: |
