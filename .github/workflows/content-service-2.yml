@@ -24,6 +24,15 @@ jobs:
           java-version: '11'
           cache: 'maven'
 
+      # Step 3: Check for build cache
+      - name: Restore Maven Build Cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
       # Step 4: Build the project
       - name: Build Content Service
         run: |
