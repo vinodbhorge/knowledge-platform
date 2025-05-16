@@ -86,6 +86,4 @@ jobs:
 
       - name: Push Docker Image
         run: |
-          IMAGE_NAME="content-service"
-          IMAGE_TAG="${{ github.ref_name }}"
           docker push $REGISTRY_URL/${IMAGE_NAME}:${IMAGE_TAG}
