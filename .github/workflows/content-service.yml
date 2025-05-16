@@ -44,6 +44,15 @@ jobs:
 
           echo "REGISTRY_URL=${REGISTRY_URL}" >> $GITHUB_ENV
 
+      - name: Build Dependencies
+        run: |
+          mvn clean install -DskipTests -f platform-core/actor-core/pom.xml
+          mvn clean install -DskipTests -f platform-core/kafka-client/pom.xml
+          mvn clean install -DskipTests -f ontology-engine/graph-engine_2.12/pom.xml
+          mvn clean install -DskipTests -f platform-modules/mimetype-manager/pom.xml
+          mvn clean install -DskipTests -f platform-modules/import-manager/pom.xml
+          mvn clean install -DskipTests -f content-api/hierarchy-manager/pom.xml
+
       - name: Build Content Service 
         run: |
           mvn clean install -DskipTests -f content-api/content-actors/pom.xml
