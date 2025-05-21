@@ -41,7 +41,7 @@ jobs:
 
       # Step 5: Set up Login to Docker registry
       - name: Container Registry Login
-        uses: ./.github/actions/registry-login-action.yaml
+        uses: ./.github/actions/registry-login
 
       # Step 6: Build Docker image 
       - name: Build Docker Image
