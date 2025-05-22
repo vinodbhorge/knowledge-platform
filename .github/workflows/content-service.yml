@@ -40,8 +40,15 @@ jobs:
             -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
 
       # Step 5: Set up Login to Docker registry
-      - name: Container Registry Login
+      - name: Registry Login
         uses: ./.github/actions/registry-login
+        with:
+          registry_provider: ${{ vars.REGISTRY_PROVIDER }}
+          gcp_service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          registry_name: ${{ secrets.REGISTRY_NAME }}
+          registry_url: ${{ secrets.REGISTRY_URL }}
+          registry_username: ${{ secrets.REGISTRY_USERNAME }}
+          registry_password: ${{ secrets.REGISTRY_PASSWORD }}
 
       # Step 6: Build Docker image 
       - name: Build Docker Image
