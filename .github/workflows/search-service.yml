@@ -49,6 +49,7 @@ jobs:
           registry_url: ${{ secrets.REGISTRY_URL }}
           registry_username: ${{ secrets.REGISTRY_USERNAME }}
           registry_password: ${{ secrets.REGISTRY_PASSWORD }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       # Step 6: Build Docker image
       - name: Build Docker Image
