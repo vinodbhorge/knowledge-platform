@@ -30,7 +30,6 @@ jobs:
             -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
 
       - name: Run Tests
-        working-directory: content-api
         run: |
           mvn test -pl content-service \
             -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} \
@@ -65,40 +64,40 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         timeout-minutes: 5
         
-      - name: Add PR Comment
-        uses: actions/github-script@v6
-        if: always()
-        with:
-          script: |
-            const testResult = '${{ job.status }}';
-            const sonarStatus = '${{ steps.sonarqube-quality-gate-check.outcome }}';
+    #   - name: Add PR Comment
+    #     uses: actions/github-script@v6
+    #     if: always()
+    #     with:
+    #       script: |
+    #         const testResult = '${{ job.status }}';
+    #         const sonarStatus = '${{ steps.sonarqube-quality-gate-check.outcome }}';
             
-            let comment = '## Content Service PR Check Results\n\n';
+    #         let comment = '## Content Service PR Check Results\n\n';
             
-            // Test Results Section
-            comment += '### Test Results\n';
-            comment += `**Status**: ${testResult === 'success' ? '✅ Passed' : '❌ Failed'}\n\n`;
+    #         // Test Results Section
+    #         comment += '### Test Results\n';
+    #         comment += `**Status**: ${testResult === 'success' ? '✅ Passed' : '❌ Failed'}\n\n`;
             
-            // Code Quality Section  
-            comment += '### Code Quality Check\n';
-            comment += `**Status**: ${sonarStatus === 'success' ? '✅ Passed' : '❌ Failed'}\n\n`;
+    #         // Code Quality Section  
+    #         comment += '### Code Quality Check\n';
+    #         comment += `**Status**: ${sonarStatus === 'success' ? '✅ Passed' : '❌ Failed'}\n\n`;
             
-            if (testResult !== 'success' || sonarStatus !== 'success') {
-              comment += '### ⚠️ Action Required\n';
-              comment += '- Please check the test failures and code quality issues\n';
-              comment += '- Fix the identified issues and update the PR\n';
-              comment += '- Detailed reports are available in the Actions tab\n';
-            } else {
-              comment += '### ✅ All Checks Passed!\n';
-              comment += 'This PR meets all quality standards.\n';
-            }
+    #         if (testResult !== 'success' || sonarStatus !== 'success') {
+    #           comment += '### ⚠️ Action Required\n';
+    #           comment += '- Please check the test failures and code quality issues\n';
+    #           comment += '- Fix the identified issues and update the PR\n';
+    #           comment += '- Detailed reports are available in the Actions tab\n';
+    #         } else {
+    #           comment += '### ✅ All Checks Passed!\n';
+    #           comment += 'This PR meets all quality standards.\n';
+    #         }
             
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
+    #         github.rest.issues.createComment({
+    #           issue_number: context.issue.number,
+    #           owner: context.repo.owner,
+    #           repo: context.repo.repo,
+    #           body: comment
+    #         });
 
       - name: Check Test Results
         if: steps.sonarqube-quality-gate-check.outcome != 'success' || job.status != 'success'
