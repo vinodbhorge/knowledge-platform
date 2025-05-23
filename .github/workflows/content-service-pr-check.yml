@@ -22,6 +22,14 @@ jobs:
           java-version: '11'
           cache: 'maven'
 
+      - name: Build Content Service
+        working-directory: content-api
+        run: |
+          mvn clean install -DskipTests=true \
+            -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} \
+            -DCLOUD_STORE_ARTIFACT_ID=${{ vars.CLOUD_STORE_ARTIFACT_ID }} \
+            -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
+
       - name: Run Tests
         working-directory: content-api
         run: |
