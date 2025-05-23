@@ -3,8 +3,7 @@ name: Content Service PR Checks
 on:
   push:
     paths:
-      - 'content-api/content-service/**'
-      - 'content-api/content-actors/**'  # Including actors as it contains core logic
+      - 'content-api/**'
 
 jobs:
   test-and-analyze:
@@ -23,6 +22,7 @@ jobs:
           cache: 'maven'
 
       - name: Build Content Service
+        working-directory: content-api
         run: |
           mvn clean install -DskipTests=true \
             -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} \
@@ -30,8 +30,9 @@ jobs:
             -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
 
       - name: Run Tests
+        working-directory: content-api
         run: |
-          mvn test -pl content-service \
+          mvn test -pl content-service -am \
             -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} \
             -DCLOUD_STORE_ARTIFACT_ID=${{ vars.CLOUD_STORE_ARTIFACT_ID }} \
             -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
