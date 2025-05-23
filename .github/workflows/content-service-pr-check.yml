@@ -21,17 +21,26 @@ jobs:
           java-version: '11'
           cache: 'maven'
 
-      - name: Build Content Service
-        run: |
-          mvn clean install -DskipTests=true \
-            -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} \
-            -DCLOUD_STORE_ARTIFACT_ID=${{ vars.CLOUD_STORE_ARTIFACT_ID }} \
-            -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
+    #   - name: Build Content Service
+    #     run: |
+    #       mvn clean install -DskipTests=true \
+    #         -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} \
+    #         -DCLOUD_STORE_ARTIFACT_ID=${{ vars.CLOUD_STORE_ARTIFACT_ID }} \
+    #         -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
 
-      - name: Run Tests
+    #   - name: Run Tests
+    #     working-directory: content-api/content-service
+    #     run: |
+    #       mvn test -pl content-service -am \
+    #         -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} \
+    #         -DCLOUD_STORE_ARTIFACT_ID=${{ vars.CLOUD_STORE_ARTIFACT_ID }} \
+    #         -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
+
+    # Build and test content-service
+      - name: Build and Test Content Service
         working-directory: content-api/content-service
         run: |
-          mvn test -pl content-service -am \
+          mvn clean verify \
             -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} \
             -DCLOUD_STORE_ARTIFACT_ID=${{ vars.CLOUD_STORE_ARTIFACT_ID }} \
             -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
