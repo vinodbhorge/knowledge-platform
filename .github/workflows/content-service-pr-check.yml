@@ -23,7 +23,6 @@ jobs:
           cache: 'maven'
 
       - name: Build Content Service
-        working-directory: content-api
         run: |
           mvn clean install -DskipTests=true \
             -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} \
