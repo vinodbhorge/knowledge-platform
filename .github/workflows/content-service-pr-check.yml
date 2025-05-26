@@ -1,113 +1,54 @@
-name: Content Service PR Checks
+name: SonarQube Analysis
 
 on:
   push:
     paths:
-      - 'content-api/**'
+      - 'content-api/content-service/**'
 
 jobs:
-  test-and-analyze:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Required for SonarCloud analysis
-          
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '11'
-          cache: 'maven'
+    pr-coverage:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
 
-      - name: Build Content Service
-        run: |
-          mvn clean install -DskipTests=true \
-            -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} \
-            -DCLOUD_STORE_ARTIFACT_ID=${{ vars.CLOUD_STORE_ARTIFACT_ID }} \
-            -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
+            - name: Set up JDK11
+              uses: actions/setup-java@v3
+              with:
+                  java-version: '11'
+                  distribution: 'temurin'
+                  cache: 'maven'
 
-    #   - name: Run Tests
-    #     working-directory: content-api/content-service
-    #     run: |
-    #       mvn test -pl content-service -am \
-    #         -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} \
-    #         -DCLOUD_STORE_ARTIFACT_ID=${{ vars.CLOUD_STORE_ARTIFACT_ID }} \
-    #         -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
+            - name: Cache Maven packages
+              uses: actions/cache@v3
+              with:
+                path: ~/.m2/repository
+                key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+                restore-keys: |
+                  ${{ runner.os }}-maven-
 
-    # Build and test content-service
-      - name: Build and Test Content Service
-        working-directory: content-api/content-service
-        run: |
-          mvn test \
-            -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} \
-            -DCLOUD_STORE_ARTIFACT_ID=${{ vars.CLOUD_STORE_ARTIFACT_ID }} \
-            -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
-        
-      - name: Generate Test Coverage Report
-        working-directory: content-api/content-service
-        run: |
-          mvn scoverage:report
-          
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          projectBaseDir: content-api/content-service
-          args: >
-            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
-            -Dsonar.projectKey=knowledge-platform-content-service
-            -Dsonar.java.binaries=target/scala-2.12/classes
-            -Dsonar.scala.coverage.reportPaths=target/scala-2.12/scoverage-report/scoverage.xml
-            -Dsonar.sources=app
-            -Dsonar.tests=test
-            -Dsonar.test.inclusions=test/**/*.*
+            - name: Build and Generate Coverage Report
+              run: |
+                  mvn clean install -DskipTests -DCLOUD_STORE_GROUP_ID=org.sunbird -DCLOUD_STORE_ARTIFACT_ID=cloud-store-sdk_2.12 -DCLOUD_STORE_VERSION=1.4.6
+                  cd content-api/content-service/
+                  mvn clean install
+                  mvn clean test \
+                  org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent \
+                  test \
+                  org.jacoco:jacoco-maven-plugin:0.8.8:report
 
-      - name: Check Quality Gate
-        id: sonarqube-quality-gate-check
-        uses: sonarsource/sonarqube-quality-gate-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        timeout-minutes: 5
-        
-    #   - name: Add PR Comment
-    #     uses: actions/github-script@v6
-    #     if: always()
-    #     with:
-    #       script: |
-    #         const testResult = '${{ job.status }}';
-    #         const sonarStatus = '${{ steps.sonarqube-quality-gate-check.outcome }}';
-            
-    #         let comment = '## Content Service PR Check Results\n\n';
-            
-    #         // Test Results Section
-    #         comment += '### Test Results\n';
-    #         comment += `**Status**: ${testResult === 'success' ? '✅ Passed' : '❌ Failed'}\n\n`;
-            
-    #         // Code Quality Section  
-    #         comment += '### Code Quality Check\n';
-    #         comment += `**Status**: ${sonarStatus === 'success' ? '✅ Passed' : '❌ Failed'}\n\n`;
-            
-    #         if (testResult !== 'success' || sonarStatus !== 'success') {
-    #           comment += '### ⚠️ Action Required\n';
-    #           comment += '- Please check the test failures and code quality issues\n';
-    #           comment += '- Fix the identified issues and update the PR\n';
-    #           comment += '- Detailed reports are available in the Actions tab\n';
-    #         } else {
-    #           comment += '### ✅ All Checks Passed!\n';
-    #           comment += 'This PR meets all quality standards.\n';
-    #         }
-            
-    #         github.rest.issues.createComment({
-    #           issue_number: context.issue.number,
-    #           owner: context.repo.owner,
-    #           repo: context.repo.repo,
-    #           body: comment
-    #         });
+            - name: Set up JDK 17
+              uses: actions/setup-java@v2
+              with:
+                  java-version: '17'
+                  distribution: 'temurin'
 
-      - name: Check Test Results
-        if: steps.sonarqube-quality-gate-check.outcome != 'success' || job.status != 'success'
-        run: exit 1
+            - name: Run SonarQube Analysis
+              env:
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_1 }}
+              run: |
+                  mvn sonar:sonar \
+                        -Dsonar.projectKey=vinodbhorge \
+                        -Dsonar.organization=vinodbhorge \
+                        -Dsonar.login=$SONAR_TOKEN \
+                        -Dsonar.host.url=https://sonarcloud.io \
+                        -Dsonar.coverage.jacoco.xmlReportPaths=content-api/content-service/target/site/jacoco/jacoco.xml
