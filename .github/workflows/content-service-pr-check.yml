@@ -64,7 +64,10 @@ jobs:
               env:
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_1 }}
               run: |
-                  mvn sonar:sonar \
+                   mvn sonar:sonar \
+                    -DCLOUD_STORE_GROUP_ID=org.sunbird \
+                    -DCLOUD_STORE_ARTIFACT_ID=cloud-store-sdk_2.12 \
+                    -DCLOUD_STORE_VERSION=1.4.7.2 \
                     -Dsonar.projectKey=vinodbhorge \
                     -Dsonar.organization=vinodbhorge \
                     -Dsonar.host.url=https://sonarcloud.io \
@@ -72,4 +75,5 @@ jobs:
                     -Dsonar.coverage.jacoco.xmlReportPaths=content-api/content-service/target/site/jacoco/jacoco.xml \
                     -Dsonar.sourceEncoding=UTF-8 \
                     -Dsonar.sources=content-api/content-service/src/main \
-                    -Dsonar.tests=content-api/content-service/src/test
+                    -Dsonar.tests=content-api/content-service/src/test \
+                    --batch-mode
