@@ -28,9 +28,9 @@ jobs:
             - name: Build and Generate Coverage Report
               run: |
                   mvn clean install -DskipTests \
-                  -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} \
-                  -DCLOUD_STORE_ARTIFACT_ID=${{ vars.CLOUD_STORE_ARTIFACT_ID }} \
-                  -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
+                  -DCLOUD_STORE_GROUP_ID=org.sunbird \
+                  -DCLOUD_STORE_ARTIFACT_ID=cloud-store-sdk_2.12 \
+                  -DCLOUD_STORE_VERSION=1.4.6
                   cd content-api/content-service/
                   mvn clean test \
                   org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent \
