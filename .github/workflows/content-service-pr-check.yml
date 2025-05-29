@@ -27,19 +27,31 @@ jobs:
 
             - name: Build and Generate Coverage Report
               run: |
-                  mvn clean install -DskipTests -DCLOUD_STORE_GROUP_ID=org.sunbird -DCLOUD_STORE_ARTIFACT_ID=cloud-store-sdk_2.12 -DCLOUD_STORE_VERSION=1.4.6
+                  mvn clean install -DskipTests \
+                  -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} \
+                  -DCLOUD_STORE_ARTIFACT_ID=${{ vars.CLOUD_STORE_ARTIFACT_ID }} \
+                  -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
                   cd content-api/content-service/
-                  mvn clean install
                   mvn clean test \
                   org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent \
                   test \
                   org.jacoco:jacoco-maven-plugin:0.8.8:report
 
-            - name: Set up JDK 17
-              uses: actions/setup-java@v2
+            - name: Upload Test Results
+              if: always()
+              uses: actions/upload-artifact@v4
               with:
-                  java-version: '17'
-                  distribution: 'temurin'
+                name: test-results
+                path: 'content-api/content-service/target/surefire-reports/*.xml'
+
+            - name: Publish Test Results to PR
+              if: always()
+              uses: dorny/test-reporter@v1
+              with:
+                name: Test Results
+                path: content-api/content-service/target/surefire-reports/*.xml
+                reporter: java-junit
+                fail-on-error: true
 
             - name: Run SonarQube Analysis
               env:
