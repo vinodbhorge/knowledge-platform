@@ -1,7 +1,7 @@
 name: PR Checks
 
 on:
-  push:
+  pull_request:
     branches:
       - '**'
 
@@ -27,8 +27,14 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Build and Run Tests
+        env:
+          CLOUD_STORE_GROUP_ID: ${{ secrets.CLOUD_STORE_GROUP_ID }}
+          CLOUD_STORE_ARTIFACT_ID: ${{ secrets.CLOUD_STORE_ARTIFACT_ID }}
+          CLOUD_STORE_VERSION: ${{ secrets.CLOUD_STORE_VERSION }}
         run: |
-          mvn clean install -DskipTests -DCLOUD_STORE_GROUP_ID=${{ vars.CLOUD_STORE_GROUP_ID }} -DCLOUD_STORE_ARTIFACT_ID=${{ vars.CLOUD_STORE_ARTIFACT_ID }} -DCLOUD_STORE_VERSION=${{ vars.CLOUD_STORE_VERSION }}
+          mvn clean install -DCLOUD_STORE_GROUP_ID="${CLOUD_STORE_GROUP_ID}" \
+            -DCLOUD_STORE_ARTIFACT_ID="${CLOUD_STORE_ARTIFACT_ID}" \
+            -DCLOUD_STORE_VERSION="${CLOUD_STORE_VERSION}"
           cd content-api/content-service/
           mvn clean verify
 
@@ -43,6 +49,14 @@ jobs:
         with:
           name: test-results
           path: 'content-api/content-service/target/surefire-reports/*.xml'
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            **/target/
+            content-api/content-service/target/site/jacoco/
 
       - name: Publish Test Results to PR
         if: always()
@@ -59,11 +73,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '11'
           distribution: 'temurin'
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
 
       - name: SonarCloud Analysis
         env:
