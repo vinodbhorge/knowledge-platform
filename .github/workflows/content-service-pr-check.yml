@@ -58,8 +58,12 @@ jobs:
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_1 }}
               run: |
                   mvn sonar:sonar \
-                        -Dsonar.projectKey=vinodbhorge \
-                        -Dsonar.organization=vinodbhorge \
-                        -Dsonar.login=$SONAR_TOKEN \
-                        -Dsonar.host.url=https://sonarcloud.io \
-                        -Dsonar.coverage.jacoco.xmlReportPaths=content-api/content-service/target/site/jacoco/jacoco.xml
+                    -Dsonar.projectKey=vinodbhorge \
+                    -Dsonar.organization=vinodbhorge \
+                    -Dsonar.host.url=https://sonarcloud.io \
+                    -Dsonar.login=${{ secrets.SONAR_TOKEN_1 }} \
+                    -Dsonar.java.binaries=content-api/content-service/target/classes \
+                    -Dsonar.coverage.jacoco.xmlReportPaths=content-api/content-service/target/site/jacoco/jacoco.xml \
+                    -Dsonar.sourceEncoding=UTF-8 \
+                    -Dsonar.sources=content-api/content-service/src/main \
+                    -Dsonar.tests=content-api/content-service/src/test
