@@ -1,79 +1,87 @@
-name: SonarQube Analysis
+name: Pull Request Checks
 
 on:
-  push:
-    branches: '**'
+  pull_request:
+    branches: [ main, master ]
+    types: [opened, synchronize, reopened]
 
 jobs:
-    pr-coverage:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v3
+  test-and-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Important for SonarQube to get full history
 
-            - name: Set up JDK11
-              uses: actions/setup-java@v3
-              with:
-                  java-version: '11'
-                  distribution: 'temurin'
-                  cache: 'maven'
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'maven'
 
-            - name: Cache Maven packages
-              uses: actions/cache@v3
-              with:
-                path: ~/.m2/repository
-                key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-                restore-keys: |
-                  ${{ runner.os }}-maven-
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
-            - name: Build and Generate Coverage Report
-              run: |
-                  mvn clean install -DskipTests \
-                  -DCLOUD_STORE_GROUP_ID=org.sunbird \
-                  -DCLOUD_STORE_ARTIFACT_ID=cloud-store-sdk_2.12 \
-                  -DCLOUD_STORE_VERSION=1.4.7.2
-                  cd content-api/content-service/
-                  mvn clean test \
-                  org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent \
-                  test \
-                  org.jacoco:jacoco-maven-plugin:0.8.8:report
+      - name: Build and Run Tests
+        run: |
+          mvn clean install -DskipTests -DCLOUD_STORE_GROUP_ID=org.sunbird -DCLOUD_STORE_ARTIFACT_ID=cloud-store-sdk_2.12 -DCLOUD_STORE_VERSION=1.4.7.2
+          cd content-api/content-service/
+          mvn clean test \
+          org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent \
+          test \
+          org.jacoco:jacoco-maven-plugin:0.8.8:report
 
-            - name: Upload Test Results
-              if: always()
-              uses: actions/upload-artifact@v4
-              with:
-                name: test-results
-                path: 'content-api/content-service/target/surefire-reports/*.xml'
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: 'content-api/content-service/target/surefire-reports/*.xml'
 
-            - name: Publish Test Results to PR
-              if: always()
-              uses: dorny/test-reporter@v1
-              with:
-                name: Test Results
-                path: content-api/content-service/target/surefire-reports/*.xml
-                reporter: java-junit
-                fail-on-error: true
+      - name: Publish Test Results
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Test Results
+          path: content-api/content-service/target/surefire-reports/*.xml
+          reporter: java-junit
+          fail-on-error: true
 
-            - name: Set up JDK17
-              uses: actions/setup-java@v3
-              with:
-                  java-version: '17'
-                  distribution: 'temurin'
-                  cache: 'maven'
+      - name: SonarCloud Analysis
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn sonar:sonar \
+          -DCLOUD_STORE_GROUP_ID=org.sunbird \
+          -DCLOUD_STORE_ARTIFACT_ID=cloud-store-sdk_2.12 \
+          -DCLOUD_STORE_VERSION=1.4.7.2 \
+          -Dsonar.projectKey=${{ github.repository_owner }}_${{ github.event.repository.name }} \
+          -Dsonar.organization=${{ github.repository_owner }} \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.java.binaries=content-api/content-service/target/classes \
+          -Dsonar.coverage.jacoco.xmlReportPaths=content-api/content-service/target/site/jacoco/jacoco.xml \
+          -Dsonar.sourceEncoding=UTF-8 \
+          -Dsonar.sources=content-api/content-service/src/main \
+          -Dsonar.tests=content-api/content-service/src/test
 
-            - name: Run SonarQube Analysis
-              env:
-                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_1 }}
-              run: |
-                   mvn sonar:sonar \
-                    -DCLOUD_STORE_GROUP_ID=org.sunbird \
-                    -DCLOUD_STORE_ARTIFACT_ID=cloud-store-sdk_2.12 \
-                    -DCLOUD_STORE_VERSION=1.4.7.2 \
-                    -Dsonar.projectKey=vinodbhorge \
-                    -Dsonar.organization=vinodbhorge \
-                    -Dsonar.host.url=https://sonarcloud.io \
-                    -Dsonar.java.binaries=content-api/content-service/target/classes \
-                    -Dsonar.coverage.jacoco.xmlReportPaths=content-api/content-service/target/site/jacoco/jacoco.xml \
-                    -Dsonar.sourceEncoding=UTF-8 \
-                    -Dsonar.sources=content-api/content-service/src/main \
-                    -Dsonar.tests=content-api/content-service/src/test \
-                    --batch-mode
+      - name: Comment PR with SonarQube Results
+        uses: actions/github-script@v6
+        if: always()
+        with:
+          script: |
+            const sonarUrl = `https://sonarcloud.io/dashboard?id=${process.env.GITHUB_REPOSITORY.replace('/', '_')}`;
+            const message = `### Quality Gate Results
+            Check the detailed SonarQube analysis at: ${sonarUrl}`;
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });
