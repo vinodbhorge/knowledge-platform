@@ -4,9 +4,17 @@ on:
   push:
     branches:
       - '*'
+  pull_request:
+    branches:
+      - '*'
+
 jobs:
   test-and-quality:
     runs-on: ubuntu-latest
+    env:
+      CLOUD_STORE_GROUP_ID: ${{ vars.CLOUD_STORE_GROUP_ID }}
+      CLOUD_STORE_ARTIFACT_ID: ${{ vars.CLOUD_STORE_ARTIFACT_ID }} 
+      CLOUD_STORE_VERSION: ${{ vars.CLOUD_STORE_VERSION }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -29,9 +37,15 @@ jobs:
 
       - name: Build and Run Tests
         run: |
-          mvn clean install -DskipTests -DCLOUD_STORE_GROUP_ID=org.sunbird -DCLOUD_STORE_ARTIFACT_ID=cloud-store-sdk_2.12 -DCLOUD_STORE_VERSION=1.4.7.2
+          mvn clean install -DskipTests \
+          -DCLOUD_STORE_GROUP_ID=${CLOUD_STORE_GROUP_ID} \
+          -DCLOUD_STORE_ARTIFACT_ID=${CLOUD_STORE_ARTIFACT_ID} \
+          -DCLOUD_STORE_VERSION=${CLOUD_STORE_VERSION}
           cd content-api/content-service/
-          mvn clean test org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent test org.jacoco:jacoco-maven-plugin:0.8.8:report -DCLOUD_STORE_GROUP_ID=org.sunbird -DCLOUD_STORE_ARTIFACT_ID=cloud-store-sdk_2.12 -DCLOUD_STORE_VERSION=1.4.7.2
+          mvn clean test org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent test org.jacoco:jacoco-maven-plugin:0.8.8:report \
+          -DCLOUD_STORE_GROUP_ID=${CLOUD_STORE_GROUP_ID} \
+          -DCLOUD_STORE_ARTIFACT_ID=${CLOUD_STORE_ARTIFACT_ID} \
+          -DCLOUD_STORE_VERSION=${CLOUD_STORE_VERSION}
 
       - name: Upload Test Results
         if: always()
@@ -61,19 +75,19 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn sonar:sonar \
-          -DCLOUD_STORE_GROUP_ID=org.sunbird \
-          -DCLOUD_STORE_ARTIFACT_ID=cloud-store-sdk_2.12 \
-          -DCLOUD_STORE_VERSION=1.4.7.2 \
+          -DCLOUD_STORE_GROUP_ID=${CLOUD_STORE_GROUP_ID} \
+          -DCLOUD_STORE_ARTIFACT_ID=${CLOUD_STORE_ARTIFACT_ID} \
+          -DCLOUD_STORE_VERSION=${CLOUD_STORE_VERSION} \
           -Dsonar.projectKey=vinodbhorge \
           -Dsonar.organization=vinodbhorge \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.coverage.jacoco.xmlReportPaths=content-api/content-service/target/site/jacoco/jacoco.xml \
-          -Dsonar.token=$SONAR_TOKEN
+          -Dsonar.token=${SONAR_TOKEN}
 
 
       - name: Comment PR with SonarQube Results
         uses: actions/github-script@v6
-        if: always()
+        if: github.event_name == 'pull_request' && always()
         with:
           script: |
             const sonarUrl = `https://sonarcloud.io/dashboard?id=${process.env.GITHUB_REPOSITORY.replace('/', '_')}`;
