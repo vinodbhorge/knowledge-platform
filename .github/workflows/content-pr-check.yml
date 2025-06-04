@@ -80,7 +80,8 @@ jobs:
           -Dsonar.organization=vinodbbhorge \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.coverage.jacoco.xmlReportPaths=content-api/content-service/target/site/jacoco/jacoco.xml \
-          -Dsonar.token=${SONAR_TOKEN}
+          -Dsonar.autoconfig.disabled=true \
+          -Dsonar.login=${SONAR_TOKEN}
 
 
       - name: Comment PR with SonarQube Results
