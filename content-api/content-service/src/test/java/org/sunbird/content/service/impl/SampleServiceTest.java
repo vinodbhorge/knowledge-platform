@@ -18,4 +18,11 @@ public class SampleServiceTest {
         assertNotNull(message);
         assertEquals("Hello World", message);
     }
+
+    @Test
+    public void testDeliberatelyFailing() {
+        // This test will fail to verify the workflow's behavior with failing tests
+        assertEquals("Expected message", sampleService.getMessage());
+        // This assertion will fail because getMessage() returns "Hello World"
+    }
 }
