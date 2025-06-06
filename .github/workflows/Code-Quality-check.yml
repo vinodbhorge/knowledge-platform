@@ -15,7 +15,6 @@ env:
   CLOUD_STORE_GROUP_ID: ${{ vars.CLOUD_STORE_GROUP_ID }}
   CLOUD_STORE_ARTIFACT_ID: ${{ vars.CLOUD_STORE_ARTIFACT_ID }}
   CLOUD_STORE_VERSION: ${{ vars.CLOUD_STORE_VERSION }}
-  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 jobs:
   build:
@@ -170,7 +169,7 @@ jobs:
           cache: 'maven'
       - name: Run SonarCloud Analysis for Content
         env:
-          SONAR_TOKEN: ${SONAR_TOKEN}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         working-directory: content-api/content-service
         run: |
           mvn sonar:sonar \
@@ -195,7 +194,7 @@ jobs:
           cache: 'maven'
       - name: Run SonarCloud Analysis for Taxonomy
         env:
-          SONAR_TOKEN: ${SONAR_TOKEN}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         working-directory: taxonomy-api/taxonomy-service
         run: |
           mvn sonar:sonar \
@@ -220,7 +219,7 @@ jobs:
           cache: 'maven'
       - name: Run SonarCloud Analysis for Search
         env:
-          SONAR_TOKEN: ${SONAR_TOKEN}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         working-directory: search-api/search-service
         run: |
           mvn sonar:sonar \
