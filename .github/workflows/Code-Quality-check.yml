@@ -230,8 +230,8 @@ jobs:
           -Dsonar.organization=vinodbbhorge \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.coverage.jacoco.xmlReportPaths=search-api/search-service/target/site/jacoco/jacoco.xml \
-          -Dsonar.java.binaries=search-api/search-service/target/classes \
-          -Dsonar.java.test.binaries=search-api/search-service/target/test-classes
+          -Dsonar.java.binaries=target/classes \
+          -Dsonar.java.test.binaries=target/test-classes
 
   comment-pr:
     needs: [sonar-analysis-content, sonar-analysis-taxonomy, sonar-analysis-search]
