@@ -160,20 +160,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 17
+      - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '11'
           distribution: 'temurin'
+          cache: 'maven'
       - name: Run SonarCloud Analysis for Content
         env:
           SONAR_TOKEN: ${SONAR_TOKEN}
         working-directory: content-api/content-service
         run: |
           mvn sonar:sonar \
-          -DCLOUD_STORE_GROUP_ID=org.sunbird \
-          -DCLOUD_STORE_ARTIFACT_ID=cloud-store-sdk_2.12 \
-          -DCLOUD_STORE_VERSION=1.4.7.2 \
+          -DCLOUD_STORE_GROUP_ID=${CLOUD_STORE_GROUP_ID} \
+          -DCLOUD_STORE_ARTIFACT_ID=${CLOUD_STORE_ARTIFACT_ID} \
+          -DCLOUD_STORE_VERSION=${CLOUD_STORE_VERSION} \
           -Dsonar.projectKey=vinodbhorge \
           -Dsonar.organization=vinodbbhorge \
           -Dsonar.host.url=https://sonarcloud.io \
@@ -184,20 +185,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 17
+      - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '11'
           distribution: 'temurin'
+          cache: 'maven'
       - name: Run SonarCloud Analysis for Taxonomy
         env:
           SONAR_TOKEN: ${SONAR_TOKEN}
         working-directory: taxonomy-api/taxonomy-service
         run: |
           mvn sonar:sonar \
-          -DCLOUD_STORE_GROUP_ID=org.sunbird \
-          -DCLOUD_STORE_ARTIFACT_ID=cloud-store-sdk_2.12 \
-          -DCLOUD_STORE_VERSION=1.4.7.2 \
+          -DCLOUD_STORE_GROUP_ID=${CLOUD_STORE_GROUP_ID} \
+          -DCLOUD_STORE_ARTIFACT_ID=${CLOUD_STORE_ARTIFACT_ID} \
+          -DCLOUD_STORE_VERSION=${CLOUD_STORE_VERSION} \
           -Dsonar.projectKey=vinodbhorge \
           -Dsonar.organization=vinodbbhorge \
           -Dsonar.host.url=https://sonarcloud.io \
@@ -208,20 +210,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 17
+      - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '11'
           distribution: 'temurin'
+          cache: 'maven'
       - name: Run SonarCloud Analysis for Search
         env:
           SONAR_TOKEN: ${SONAR_TOKEN}
         working-directory: search-api/search-service
         run: |
           mvn sonar:sonar \
-          -DCLOUD_STORE_GROUP_ID=org.sunbird \
-          -DCLOUD_STORE_ARTIFACT_ID=cloud-store-sdk_2.12 \
-          -DCLOUD_STORE_VERSION=1.4.7.2 \
+          -DCLOUD_STORE_GROUP_ID=${CLOUD_STORE_GROUP_ID} \
+          -DCLOUD_STORE_ARTIFACT_ID=${CLOUD_STORE_ARTIFACT_ID} \
+          -DCLOUD_STORE_VERSION=${CLOUD_STORE_VERSION} \
           -Dsonar.projectKey=vinodbhorge \
           -Dsonar.organization=vinodbbhorge \
           -Dsonar.host.url=https://sonarcloud.io \
