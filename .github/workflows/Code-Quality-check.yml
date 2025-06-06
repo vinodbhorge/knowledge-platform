@@ -177,8 +177,8 @@ jobs:
           -DCLOUD_STORE_GROUP_ID=${CLOUD_STORE_GROUP_ID} \
           -DCLOUD_STORE_ARTIFACT_ID=${CLOUD_STORE_ARTIFACT_ID} \
           -DCLOUD_STORE_VERSION=${CLOUD_STORE_VERSION} \
-          -Dsonar.projectKey=vinodbhorge \
-          -Dsonar.organization=vinodbhorge \
+          -Dsonar.projectKey=vinodbhorge_knowledge-platform \
+          -Dsonar.organization=vinodbbhorge \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.coverage.jacoco.xmlReportPaths=content-api/content-service/target/site/jacoco/jacoco.xml
 
@@ -202,8 +202,8 @@ jobs:
           -DCLOUD_STORE_GROUP_ID=${CLOUD_STORE_GROUP_ID} \
           -DCLOUD_STORE_ARTIFACT_ID=${CLOUD_STORE_ARTIFACT_ID} \
           -DCLOUD_STORE_VERSION=${CLOUD_STORE_VERSION} \
-          -Dsonar.projectKey=vinodbhorge \
-          -Dsonar.organization=vinodbhorge \
+          -Dsonar.projectKey=vinodbhorge_knowledge-platform \
+          -Dsonar.organization=vinodbbhorge \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.coverage.jacoco.xmlReportPaths=taxonomy-api/taxonomy-service/target/site/jacoco/jacoco.xml
 
@@ -227,8 +227,8 @@ jobs:
           -DCLOUD_STORE_GROUP_ID=${CLOUD_STORE_GROUP_ID} \
           -DCLOUD_STORE_ARTIFACT_ID=${CLOUD_STORE_ARTIFACT_ID} \
           -DCLOUD_STORE_VERSION=${CLOUD_STORE_VERSION} \
-          -Dsonar.projectKey=vinodbhorge \
-          -Dsonar.organization=vinodbhorge \
+          -Dsonar.projectKey=vinodbhorge_knowledge-platform \
+          -Dsonar.organization=vinodbbhorge \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.coverage.jacoco.xmlReportPaths=search-api/search-service/target/site/jacoco/jacoco.xml
 
