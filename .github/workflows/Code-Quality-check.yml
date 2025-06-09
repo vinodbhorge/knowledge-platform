@@ -225,6 +225,11 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         working-directory: search-api/search-service
         run: |
+          mvn clean compile \
+            -DCLOUD_STORE_GROUP_ID=${CLOUD_STORE_GROUP_ID} \
+            -DCLOUD_STORE_ARTIFACT_ID=${CLOUD_STORE_ARTIFACT_ID} \
+            -DCLOUD_STORE_VERSION=${CLOUD_STORE_VERSION}
+
           mvn sonar:sonar \
             -DCLOUD_STORE_GROUP_ID=${CLOUD_STORE_GROUP_ID} \
             -DCLOUD_STORE_ARTIFACT_ID=${CLOUD_STORE_ARTIFACT_ID} \
@@ -232,7 +237,9 @@ jobs:
             -Dsonar.projectKey=Sunbird-Knowlg_knowledge-platform \
             -Dsonar.organization=sunbird-knowlg-1 \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+            -Dsonar.java.binaries=target/classes \
+            -Dsonar.java.test.binaries=target/test-classes \
+            -Dsonar.coverage.jacoco.xmlReportPaths=search-api/search-service/target/site/jacoco/jacoco.xml
 
   comment-pr:
     needs: [sonar-analysis-content, sonar-analysis-taxonomy, sonar-analysis-search]
