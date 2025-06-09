@@ -156,6 +156,20 @@ jobs:
           reporter: java-junit
           fail-on-error: true
 
+      - name: Run SonarCloud Analysis for Search
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        working-directory: search-api/search-service
+        run: |
+            mvn sonar:sonar \
+              -DCLOUD_STORE_GROUP_ID=${CLOUD_STORE_GROUP_ID} \
+              -DCLOUD_STORE_ARTIFACT_ID=${CLOUD_STORE_ARTIFACT_ID} \
+              -DCLOUD_STORE_VERSION=${CLOUD_STORE_VERSION}
+              -Dsonar.projectKey=Sunbird-Knowlg_knowledge-platform \
+              -Dsonar.organization=sunbird-knowlg-1 \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+
   sonar-analysis-content:
     needs: test-content
     runs-on: ubuntu-latest
@@ -206,39 +220,21 @@ jobs:
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.coverage.jacoco.xmlReportPaths=taxonomy-api/taxonomy-service/target/site/jacoco/jacoco.xml
 
-  sonar-analysis-search:
-    needs: test-search
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'maven'
-      - name: Run SonarCloud Analysis for Search
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        working-directory: search-api/search-service
-        run: |
-          run: |
-            mvn clean verify -DskipTests=false \
-              -DCLOUD_STORE_GROUP_ID=${CLOUD_STORE_GROUP_ID} \
-              -DCLOUD_STORE_ARTIFACT_ID=${CLOUD_STORE_ARTIFACT_ID} \
-              -DCLOUD_STORE_VERSION=${CLOUD_STORE_VERSION}
-
-            mvn sonar:sonar \
-              -DCLOUD_STORE_GROUP_ID=${CLOUD_STORE_GROUP_ID} \
-              -DCLOUD_STORE_ARTIFACT_ID=${CLOUD_STORE_ARTIFACT_ID} \
-              -DCLOUD_STORE_VERSION=${CLOUD_STORE_VERSION}
-              -Dsonar.projectKey=Sunbird-Knowlg_knowledge-platform \
-              -Dsonar.organization=sunbird-knowlg-1 \
-              -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+  # sonar-analysis-search:
+  #   needs: test-search
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Set up JDK 17
+  #       uses: actions/setup-java@v3
+  #       with:
+  #         java-version: '17'
+  #         distribution: 'temurin'
+  #         cache: 'maven'
+      
 
   comment-pr:
-    needs: [sonar-analysis-content, sonar-analysis-taxonomy, sonar-analysis-search]
+    needs: [sonar-analysis-content, sonar-analysis-taxonomy]
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
